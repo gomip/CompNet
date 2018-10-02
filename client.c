@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -14,7 +15,7 @@ int main(int argc, char *argv[]){
 	struct sockaddr_in sin; 
 	char *host;
 	char buf[MAX_LINE];
-	int s;
+	int s=socket(PF_INET,SOCK_STREAM,0);
 	int len;
 
 	if(argc==2){
@@ -26,8 +27,9 @@ int main(int argc, char *argv[]){
 
 	//host name into peer's ip
 	hp=gethostbyname(host);
-	if(!hp){
+	if(hp==NULL){
 		fprintf(stderr,"unknown host : %s\n",host);
+		exit(0);
 	}
 
 	//addr data structure
@@ -37,14 +39,16 @@ int main(int argc, char *argv[]){
 	sin.sin_port=htons(SERVER_PORT); //host byte -> network byte
 
 	//active open
-	if((s=socket(PF_INET,SOCK_STREAM,0))<0){
-		perror("socket");
+	if(s<0){
+		perror("cannot open socket");
+		exit(0);
 	}
 
 	if(connect(s,(struct sockaddr *)&sin,sizeof(sin))<0){
-		perror("connect");
+		perror("cannot connect");
 		close(s);
 	}
+	bzero(buf,MAX_LINE);
 
 	while(fgets(buf,sizeof(buf),stdin)){
 		buf[MAX_LINE-1]='\0';
