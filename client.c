@@ -14,9 +14,11 @@ int main(int argc, char *argv[]){
 	struct hostent *hp;
 	struct sockaddr_in sin; 
 	char *host;
-	char buf[MAX_LINE];
+	char buf[]="2014210069";
 	int s=socket(PF_INET,SOCK_STREAM,0);
 	int len;
+
+	host = '127.0.0.1';
 
 	if(argc==2){
 		host=argv[1];
@@ -40,19 +42,18 @@ int main(int argc, char *argv[]){
 
 	//active open
 	if(s<0){
-		perror("cannot open socket");
+		perror("socket");
 		exit(0);
 	}
 
 	if(connect(s,(struct sockaddr *)&sin,sizeof(sin))<0){
-		perror("cannot connect");
+		perror("connect");
 		close(s);
 	}
 	bzero(buf,MAX_LINE);
 
-	while(fgets(buf,sizeof(buf),stdin)){
 		buf[MAX_LINE-1]='\0';
 		len=strlen(buf)+1;
 		send(s,buf,len,0);
-	}
+
 }
